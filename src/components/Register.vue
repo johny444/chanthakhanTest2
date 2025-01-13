@@ -34,10 +34,10 @@
           <v-row>
             <v-text-field
               :rules="[required]"
-              label="Comfirm Password"
+              label="Confirm Password"
               variant="outlined"
               density="comfortable"
-              v-model="txtUserpassword"
+              v-model="txtUserpasswordCF"
               clearable=""
               prepend-inner-icon="fas fa-unlock"
               :append-inner-icon="showPw ? 'fas fa-eye' : 'fas fa-eye-slash'"
@@ -66,9 +66,10 @@
     </v-container>
   </div>
 </template>
-    
-    <script>
-import { v4 as uuidv4 } from "uuid";
+
+<script>
+import { useUserStore } from "@/stores/userStore";
+import { ref } from "vue";
 
 export default {
   data() {
@@ -81,33 +82,38 @@ export default {
       required(v) {
         return !!v || "Field is required";
       },
+      alterStore: useAlertStore(),
+      userStore: useUserStore(),
     };
   },
   methods: {
-    onRegister() {
-      if (this.itemInput.trim()) {
-        this.ToDoItems.push({
-          id: uuidv4(),
-          label: this.itemInput,
-          done: false,
-        });
-        this.itemInput = "";
+    async onRegister() {
+      if (this.txtUserpassword !== this.txtUserpasswordCF) {
+        console.error("Passwords do not match.");
+        this.alterStore.openDialog(
+          "E",
+          "Passwords do not match.Please try again"
+        );
+        setTimeout(() => {
+          this.alterStore.closeDialog();
+        }, 2000);
+        return;
       }
-    },
-    toggleTaskStatus(itemID) {
-      const task = this.ToDoItems.find((item) => item.id === itemID);
-      console.log("task before", task);
-      if (task) {
-        task.done = !task.done;
-        console.log("task after", task);
-      }
-    },
-    deleteTask(itemID) {
-      this.ToDoItems = this.ToDoItems.filter((item) => item.id !== itemID);
+      const payload = {
+        email: this.txtUserEmail,
+        password: this.txtUserpassword,
+      };
+      await this.userStore.register(payload);
+      this.alterStore.openDialog("S", "Registor successful");
+      setTimeout(() => {
+        this.alterStore.closeDialog();
+      }, 2000);
+      this.$router.push("/");
     },
   },
 };
 </script>
+
     
     <style scoped>
 .labelPage {
