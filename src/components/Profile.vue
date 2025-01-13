@@ -1,11 +1,8 @@
 <template>
-  <div>
+  <v-container class="profile-container">
     <v-row no-gutters>
       <v-col align="end" cols="9">
-        <v-avatar
-          image="https://th.bing.com/th/id/OIP.6YS0Z_aH7ynJROf5YaKfRgHaHa?w=201&h=201&c=7&r=0&o=5&dpr=1.3&pid=1.7"
-          size="120"
-        ></v-avatar>
+        <v-avatar :image="user.avatar" size="120"></v-avatar>
       </v-col>
       <v-col align="end">
         <v-icon
@@ -21,17 +18,17 @@
       <h3 class="text-center">{{ $t("info") }}</h3>
       <div>
         <p>{{ $t("name") }}: {{ user.first_name }}</p>
-        <p>{{ $t("email") }}: {{ user.last_name }}</p>
-        <p>{{ $t("phoneNumber") }}: {{ user.email }}</p>
-        <p>{{ $t("birthday") }}: {{ user.birthday }}</p>
+        <p>{{ $t("last name") }}: {{ user.last_name }}</p>
+        <p>{{ $t("email") }}: {{ user.email }}</p>
+        <!-- <p>{{ $t("birthday") }}: {{ user.birthday }}</p> -->
       </div>
     </v-col>
-    <!-- <v-card-actions>
-      <v-btn block @click="logout">
+    <v-card-actions>
+      <v-btn block @click="logout" class="bg-pink-darken-1">
         {{ $t("logOut") }}
       </v-btn>
-    </v-card-actions> -->
-  </div>
+    </v-card-actions>
+  </v-container>
 </template>
 
 <script>
@@ -40,17 +37,20 @@ export default {
   name: "profile",
   data() {
     return {
+      storeUser: useUserStore(),
       storeCRUD: useCrudStore(),
-      user: "", // Initialize user as an empty string or adjust as needed
+      user: {}, // Initialize user as an empty string or adjust as needed
     };
   },
   methods: {
-    async getUserInfo() {
-      await this.storeCRUD.getUserInfor(1);
+    async getUserInfo(id) {
+      await this.storeCRUD.getUserInfor(id);
+      this.user = this.storeCRUD.user;
+      console.log("user", this.user);
     },
 
     logout() {
-      localStorage.removeItem("token");
+      this.storeUser.logOut();
       try {
         this.$router.push("/");
       } catch (error) {
@@ -59,10 +59,14 @@ export default {
     },
   },
   mounted() {
-    this.getUserInfo();
+    this.getUserInfo(1);
   },
 };
 </script>
 
 
-<style lang="scss" scoped></style>
+<style  scoped>
+.profile-container {
+  box-shadow: rgba(143, 140, 140, 0.56) 0px 22px 70px 4px;
+}
+</style>

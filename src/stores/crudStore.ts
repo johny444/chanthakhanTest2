@@ -6,6 +6,7 @@ import { ref } from "vue";
 export const useCrudStore = defineStore("CrudStore", {
   state: () => ({
     userList: ref([]),
+    user: ref([]),
   }),
   getters: {},
   actions: {
@@ -13,8 +14,8 @@ export const useCrudStore = defineStore("CrudStore", {
       try {
         const response = await axios.get(`https://reqres.in/api/users/${id}`);
 
-        this.userList = response.data.data;
-        console.log("User List fetched:", this.userList);
+        this.user = response.data.data;
+        console.log("User List fetched:", this.user);
       } catch (error) {
         console.error("Error fetching user list:", error);
       }
@@ -48,10 +49,15 @@ export const useCrudStore = defineStore("CrudStore", {
     },
 
     async deleteUser(userId: any) {
+      console.log("store ", userId);
       try {
-        await axios.delete(`https://reqres.in/api/users/${userId}`);
+        let response = await axios.delete(
+          `https://reqres.in/api/users/${userId}`
+        );
+        console.log("response Delete:", response);
         console.log(`User with ID ${userId} deleted successfully.`);
         this.userList = this.userList.filter((user) => user.id !== userId);
+        return response;
       } catch (error) {
         console.error("Error deleting user:", error);
       }
