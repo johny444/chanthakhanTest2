@@ -1,6 +1,7 @@
 <template>
-  <v-container class="bg-green">
-    <v-row>
+  <Profile />
+  <v-container class="mt-8">
+    <v-row class="my-2">
       <v-col style="text-align: center">
         <h2>USER MANAGEMENT SYSTEM</h2>
       </v-col>
@@ -9,13 +10,10 @@
       <thead>
         <tr>
           <th>{{ $t("rowNum") }}</th>
-          <th>{{ $t("FULLNAME") }}</th>
-          <th>{{ $t("CONTRACTNO") }}</th>
-          <th>{{ $t("DURATION") }}</th>
-          <th>{{ $t("STARTDATE") }}</th>
-          <th>{{ $t("ENDDATE") }}</th>
-          <th>{{ $t("POSITION") }}</th>
-          <th>{{ $t("DEPARTMENT") }}</th>
+          <th>{{ $t("NAME") }}</th>
+          <th>{{ $t("LASTNAME") }}</th>
+          <th>{{ $t("EMAIL") }}</th>
+          <th>{{ $t("ACTION") }}</th>
         </tr>
       </thead>
       <tbody>
@@ -24,17 +22,10 @@
             <td width="2%" align="center">
               {{ (currentPage - 1) * perPage + i + 1 }}
             </td>
-            <td width="15%">{{ item.EMPNAME }}</td>
-            <td width="5%" align="center">{{ item.CONTRACTNO }}</td>
-            <td width="5%" align="center">{{ item.DURATION }}</td>
-            <td width="5%" align="center">
-              {{ formatDateShow(item.STARTDATE) }}
-            </td>
-            <td width="5%" align="center">
-              {{ item.ENDDATE ? formatDateShow(item.ENDDATE) : "-" }}
-            </td>
-            <td width="10%">{{ item.POSITION }}</td>
-            <td width="20%">{{ item.DEP }}</td>
+            <td width="5%">{{ item.first_name }}</td>
+            <td width="5%" align="center">{{ item.last_name }}</td>
+            <td width="5%" align="center">{{ item.email }}</td>
+            <td width="5%" align="center">ACTION</td>
           </tr>
         </template>
         <template v-else>
@@ -69,12 +60,16 @@
 </template>
 
 <script>
+import { useCrudStore } from "@/stores/crudStore";
+import { useLoadingStore } from "@/stores/loadingStore";
+import { ref } from "vue";
+
 export default {
   data() {
     return {
-      tableData: [], // Complete data from the API
-      perPage: 10, // Number of rows per page
-      currentPage: 1, // Current page
+      tableData: [],
+      perPage: 10,
+      currentPage: 1,
       loading: true,
       storeCRUD: useCrudStore(),
       loadingStore: useLoadingStore(),
@@ -91,10 +86,10 @@ export default {
       );
     },
     totalPages() {
-      return Math.ceil(this.tableData.length / this.perPage); // Calculate total pages
+      return Math.ceil(this.tableData.length / this.perPage);
     },
     paginatedData() {
-      if (!this.tableData) return []; // Handle undefined tableData
+      if (!this.tableData) return [];
       const start = (this.currentPage - 1) * this.perPage;
       const end = start + this.perPage;
       return this.tableData.slice(start, end);
@@ -110,31 +105,26 @@ export default {
   methods: {
     async getList() {
       await this.storeCRUD.getUserList();
-      // this.tableData = this.storeCRUD.userList;
-      // console.log("tableData:", this.tableData);
-      // this.total = this.storeCRUD.userList.length;
+      this.tableData = this.storeCRUD.userList;
+      console.log("table", this.tableData);
     },
 
     onSubmit() {
-      console.log("start", this.formatDate(this.startDate));
-      console.log("start", this.formatDate(this.endDate));
+      // console.log("start", this.formatDate(this.startDate));
+      // console.log("start", this.formatDate(this.endDate));
 
-      let period = {
-        start: this.formatDate(this.startDate),
-        end: this.formatDate(this.endDate),
-      };
+      // let period = {
+      //   start: this.formatDate(this.startDate),
+      //   end: this.formatDate(this.endDate),
+      // };
 
-      // console.log("date:", period);
       this.getList(period);
     },
   },
   async mounted() {
     this.loadingStore.openLoading();
-    await this.getList(); // Updated to fetch data directly
+    await this.getList(); // Fetch data directly
     this.loadingStore.closeLoading();
   },
 };
 </script>
-
-<style lang="scss" scoped>
-</style>

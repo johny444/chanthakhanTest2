@@ -3,15 +3,26 @@ import { defineStore } from "pinia";
 import axios from "axios";
 import { ref } from "vue";
 
-export const useCrudStore = defineStore("TodoStore", {
+export const useCrudStore = defineStore("CrudStore", {
   state: () => ({
     userList: ref([]),
   }),
   getters: {},
   actions: {
+    async getUserInfor(id: number) {
+      try {
+        const response = await axios.get(`https://reqres.in/api/users/${id}`);
+
+        this.userList = response.data.data;
+        console.log("User List fetched:", this.userList);
+      } catch (error) {
+        console.error("Error fetching user list:", error);
+      }
+    },
     async getUserList() {
       try {
         const response = await axios.get("https://reqres.in/api/users?page=1");
+
         this.userList = response.data.data;
         console.log("User List fetched:", this.userList);
       } catch (error) {
