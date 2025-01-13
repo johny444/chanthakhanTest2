@@ -18,21 +18,36 @@ export const useUserStore = defineStore("userStore", {
           payload
         );
         if (response && response.data) {
-          this.user = response.data; // Update user data on success
-          this.islogin = true; // Set login state to true
-          localStorage.setItem("token", response.data.token); // Save token in localStorage
+          this.user = response.data;
+          this.islogin = true;
+          localStorage.setItem("token", response.data.token);
           console.log("Login successful:", response.data);
         }
       } catch (error) {
         console.error("Error during login:", error);
-        this.user = {}; // Clear user state on error
-        this.islogin = false; // Reset login state
+        this.user = {};
+        this.islogin = false;
       }
     },
-    aclogOut() {
-      this.user = {}; // Clear user data
-      this.islogin = false; // Reset login state
-      localStorage.removeItem("token"); // Remove token from localStorage
+    async register(payload: any) {
+      try {
+        const response = await axios.post(
+          "https://reqres.in/api/register",
+          payload
+        );
+        if (response && response.data) {
+          this.user = response.data;
+          console.log("Registration successful:", response.data);
+        }
+      } catch (error) {
+        console.error("Error during registration:", error);
+        this.user = {};
+      }
+    },
+    logOut() {
+      this.user = {};
+      this.islogin = false;
+      localStorage.removeItem("token");
       console.log("User logged out");
     },
   },
